@@ -1,0 +1,56 @@
+ #!/usr/bin/env python
+import re
+from collections import Counter
+
+def words(filename):
+    list =[]
+    with open((filename),'r',encoding="utf8", errors='ignore') as f:
+        for line in f:
+            for word in line.split():
+               list.append(word)
+        return list
+
+    #print (type(file01)
+
+WORDS = Counter((words("page-movie-review-in-tamil.txt")))
+#print (WORDS)
+print (WORDS.most_common(20))
+
+def P(word, N=sum(WORDS.values())):
+    "Probability of `word`."
+    try:
+        z = WORDS[word] / N
+    except ZeroDivisionError:
+        z = 0
+    return z
+
+def correction(word):
+    "Most probable spelling correction for word."
+    print (max(candidates(word), key=P))
+    return max(candidates(word), key=P)
+
+def candidates(word):
+    "Generate possible spelling corrections for word."
+    return (known([word]) or known(edits1(word)) or known(edits2(word)) or [word])
+
+def known(words):
+    "The subset of `words` that appear in the dictionary of WORDS."
+    return set(w for w in words if w in WORDS)
+
+def edits1(word):
+    "All edits that are one edit away from `word`."
+    letters    = ('அஆஇஈஉஊஎஏஐஒஓஔக்ங்ச்ஞ்ட்ண்த்ந்ப்ம்ய்ர்ல்வ்ழ்ள்ற்ன்கஙசஞடணதநபமயரலவழளறனகாஙாசாஞாடாணாதாநாபாமாயாராவாழாளாறானாகிஙிசிஞிடிணிதிநிபிமியிரிலிவிழிளிறினகீஙீசீஞீடீணீதீநீபீமீயீரீலீவீழீளீறீனீிகுஙுசுஞுடுணுதுநுபுமுயுருலுவழுளுறுனுகூ ஙூ சூ ஞூ டூ ணூ தூ நூ பூ மூ யூ ரூ லூ வூ ழூ ளூ றூ னூகெ ஙெ செ ஞெ டெ ணெ தெ நெ பெ மெ யெ ரெ லெ வெ ழெ ளெ றெ னெகே ஙே சே ஞே டே ணே தே நே பே மே யே ரே லே வே ழே ளே றே னேகை ஙை சை ஞை டை ணை தை நை பை மை யை ரை லை வை ழை ளை றை னைகொ ஙொ சொ ஞொ டொ ணொ தொ நொ பொ மொ யொ ரொ லொ வொ ழொ ளொ றொ னொகோ ஙோ சோ ஞோ டோ ணோ தோ நோ போ மோ யோ ரோ லோ வோ ழோ ளோ றோ னோகௌ ஙௌ சௌ ஞௌ டௌ ணௌ தௌ நௌ பௌ மௌ யௌ ரௌ லௌ வௌ ழௌ ளௌ றௌ னௌ')
+    letters.encode("utf8")
+    splits     = [(word[:i], word[i:])    for i in range(len(word) + 1)]
+    deletes    = [L + R[1:]               for L, R in splits if R]
+    transposes = [L + R[1] + R[0] + R[2:] for L, R in splits if len(R)>1]
+    replaces   = [L + c + R[1:]           for L, R in splits if R for c in letters]
+    inserts    = [L + c + R               for L, R in splits for c in letters]
+    return set(deletes + transposes + replaces + inserts)
+
+def edits2(word):
+    "All edits that are two edits away from `word`."
+    return (e2 for e1 in edits1(word) for e2 in edits1(e1))
+
+
+
